@@ -8,11 +8,11 @@
     }
 
     html {
-        @apply flex flex-col min-h-[100svh] text-16px;
+        @apply flex flex-col min-h-[100svh] text-sm;
     }
 
     body {
-        @apply flex-1 flex flex-col scroll-smooth text-black font-inter;
+        @apply flex-1 flex flex-col scroll-smooth text-black font-mono;
     }
 
     main {
@@ -31,10 +31,6 @@
 }
 
 @layer components {
-    .logo {
-        @apply h1 text-white font-y-touch text-[3rem] tracking-wide font-medium;
-    }
-
     .separator {
         @apply relative;
 
@@ -43,59 +39,35 @@
         }
     }
 
-    .page {
-        @apply pt-40
-    }
-
-    .container {
-        @apply mx-auto max-w-1280 p-4;
-    }
-
-    .card {
-        @apply w-[100%] h-[100%] bg-transparent rounded-12px flex-center transition-all;
-    }
-
-    .perspective-1000 {
-        perspective: 1000px;
-    }
-
-    .preserve-3d {
-        transform-style: preserve-3d;
-    }
-
-    .backface-hidden {
-        backface-visibility: hidden;
-    }
-
     .h1 {
-        @apply text-h1 font-noto;
+        @apply text-h1 font-mono;
     }
 
     .h2 {
-        @apply text-h2 font-noto;
+        @apply text-h2 font-mono;
     }
 
     .h3 {
-        @apply text-h3 font-noto;
+        @apply text-h3 font-mono;
     }
 
     .h4 {
-        @apply text-h4 font-noto;
+        @apply text-h4 font-mono;
     }
 
     .h5 {
-        @apply text-h5 font-noto;
+        @apply text-h5 font-mono;
     }
 
     .h6 {
-        @apply text-h6 font-noto;
+        @apply text-h6 font-mono;
     }
 
     .text-body-1,
     .text-body-2,
     .text-body-3,
     .text-body-4 {
-        @apply font-inter;
+        @apply font-mono;
     }
 
     p {
@@ -103,57 +75,17 @@
     }
 
     .text-superscript-1 {
-        @apply font-noto;
+        @apply font-mono;
     }
 
     .text-superscript-2 {
         @apply font-inter;
     }
-
-    .panel-clip-polygon {
-        clip-path: polygon(0 0, 100% 0, 99% 100%, 1% 99%);
-    }
-
-    .panel {
-        @apply w-full h-full bg-gray-800 text-white cursor-pointer shadow-md ease-out
-        duration-300 transition-all relative rounded-lg hover:after:opacity-100;
-
-        &::after {
-            @apply absolute content-[""] w-full h-[0.3rem] left-0 bottom-0 bg-white opacity-0 panel-clip-polygon;
-        }
-    }
 }
 
 @layer utilities {
-    .radical-gradient-animation {
-        content: '';
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        transform: scale(0);
-        transition: transform .2s ease-in;
-        mix-blend-mode: difference;
-        background: radial-gradient(
-                circle at center,
-                #fff 24%,
-                #000 25%,
-                #000 100%);
-    }
-
-    .bg-purple-gradient {
-        background: linear-gradient(90deg, rgba(29, 55, 145, 100%) 0%, rgba(0, 25, 52, 100%) 100%);
-    }
-
-    .scale-4 {
-        transform: scale(4);
-    }
-
     .disabled {
         @apply opacity-80 pointer-events-none;
-    }
-
-    .gray-border {
-        @apply border border-gray-200 focus-within:border-gray-300 hover:border-gray-300;
     }
 
     .click-scale {
@@ -210,34 +142,5 @@
 
     .flex-cb {
         @apply flex items-center justify-between;
-    }
-
-    .splide-pagination {
-        .is-active {
-            @apply bg-primary;
-        }
-    }
-
-    .custom-scrollbar::-webkit-scrollbar {
-        @apply w-[.6rem] h-[.6rem];
-
-        /* w - applies only for vertical scroller */
-
-        /* h - applies only for horizontal scroller  */
-    }
-
-    .custom-scrollbar::-webkit-scrollbar-track {
-        background: inherit;
-        margin-block: .5rem;
-    }
-
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-        background: #7749F8;
-        border-radius: 1rem;
-        height: 30px;
-    }
-
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-        background: hsl(120deg 100% 10% / 100%);
     }
 }

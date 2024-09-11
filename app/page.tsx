@@ -1,3 +1,3 @@
 export default function MainPage() {
-	return <main>HERE WE Go</main>
+	return <main className={""}>HERE WE Go</main>
 }

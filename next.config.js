@@ -1,6 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 /** @type {import('next').NextConfig} */
-const nextConfig = {
+module.exports = {
 	output: "standalone",
 	reactStrictMode: true,
 	images: {
@@ -11,4 +11,3 @@ const nextConfig = {
 	},
 }
 
-module.exports = nextConfig
