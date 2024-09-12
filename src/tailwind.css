@@ -40,27 +40,27 @@
     }
 
     .h1 {
-        @apply text-h1 font-mono;
+        @apply text-5xl font-mono;
     }
 
     .h2 {
-        @apply text-h2 font-mono;
+        @apply text-4xl font-mono;
     }
 
     .h3 {
-        @apply text-h3 font-mono;
+        @apply text-3xl font-mono;
     }
 
     .h4 {
-        @apply text-h4 font-mono;
+        @apply text-2xl font-mono;
     }
 
     .h5 {
-        @apply text-h5 font-mono;
+        @apply text-lg font-mono;
     }
 
     .h6 {
-        @apply text-h6 font-mono;
+        @apply text-sm font-mono;
     }
 
     .text-body-1,
