@@ -1,10 +1,11 @@
 import { CodegenConfig } from "@graphql-codegen/cli"
 
 const codegen: CodegenConfig = {
+	// TODO: ADD TO DOT ENV
 	schema: "https://api.escuelajs.co/graphql",
 	documents: ["src/**/*.{ts,tsx}", "app/**/*.{ts,tsx}"],
 	generates: {
-		"./__generated__/": {
+		"./src/__generated__/": {
 			preset: "client",
 			plugins: [],
 			presetConfig: {

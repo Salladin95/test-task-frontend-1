@@ -7,7 +7,11 @@ module.exports = {
 		remotePatterns: [],
 	},
 	async rewrites() {
-		return []
+		return [
+			{
+				source: "/api/:path*",
+				destination: `${process.env.NEXT_PUBLIC_API_URL}/:path*`,
+			},
+		]
 	},
 }
-

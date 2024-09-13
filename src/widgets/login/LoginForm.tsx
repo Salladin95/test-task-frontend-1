@@ -1,6 +1,7 @@
 "use client"
 import React from "react"
 import { useLoginMutation } from "./useLogin"
+import { useLocalStoreToken } from "~/shared/hooks/useLocalStoreToken"
 import {
 	Button,
 	Card,
@@ -17,13 +18,12 @@ export const description = "A simple login form with email and password. The sub
 
 export function LoginForm() {
 	const { login } = useLoginMutation()
+	const [_, setToken] = useLocalStoreToken()
 
 	const handleSubmit = async () => {
 		try {
 			const { data: res } = await login({ variables: { email: "john@mail.com", password: "changeme" } })
-
-			console.log("Access Token:", res?.login.access_token)
-			console.log("Refresh Token:", res?.login.refresh_token)
+			res && setToken({ accessToken: res.login.access_token, refreshToken: res.login.refresh_token })
 		} catch (err) {
 			console.error("Login error:", err)
 		}

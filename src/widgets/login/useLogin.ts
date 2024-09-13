@@ -1,6 +1,6 @@
-import { gql } from "../../../__generated__"
+import { gql } from "~/__generated__"
 import { useMutation } from "@apollo/client"
-import { LoginMutation } from "../../../__generated__/graphql"
+import { LoginMutation } from "~/__generated__/graphql"
 
 const LOGIN_MUTATION = gql(`
 	mutation login($email: String!, $password: String!) {

@@ -214,6 +214,22 @@ export type User = {
 	updatedAt: Scalars["DateTime"]["output"]
 }
 
+export type MyProfileQueryVariables = Exact<{ [key: string]: never }>
+
+export type MyProfileQuery = {
+	__typename?: "Query"
+	myProfile: {
+		__typename?: "User"
+		id: string
+		email: string
+		name: string
+		role: string
+		avatar: string
+		creationAt: any
+		updatedAt: any
+	}
+}
+
 export type LoginMutationVariables = Exact<{
 	email: Scalars["String"]["input"]
 	password: Scalars["String"]["input"]
@@ -224,6 +240,46 @@ export type LoginMutation = {
 	login: { __typename?: "Login"; access_token: string; refresh_token: string }
 }
 
+export type RefreshTokenMutationVariables = Exact<{
+	refreshToken: Scalars["String"]["input"]
+}>
+
+export type RefreshTokenMutation = {
+	__typename?: "Mutation"
+	refreshToken: { __typename?: "Login"; access_token: string; refresh_token: string }
+}
+
+export const MyProfileDocument = {
+	kind: "Document",
+	definitions: [
+		{
+			kind: "OperationDefinition",
+			operation: "query",
+			name: { kind: "Name", value: "myProfile" },
+			selectionSet: {
+				kind: "SelectionSet",
+				selections: [
+					{
+						kind: "Field",
+						name: { kind: "Name", value: "myProfile" },
+						selectionSet: {
+							kind: "SelectionSet",
+							selections: [
+								{ kind: "Field", name: { kind: "Name", value: "id" } },
+								{ kind: "Field", name: { kind: "Name", value: "email" } },
+								{ kind: "Field", name: { kind: "Name", value: "name" } },
+								{ kind: "Field", name: { kind: "Name", value: "role" } },
+								{ kind: "Field", name: { kind: "Name", value: "avatar" } },
+								{ kind: "Field", name: { kind: "Name", value: "creationAt" } },
+								{ kind: "Field", name: { kind: "Name", value: "updatedAt" } },
+							],
+						},
+					},
+				],
+			},
+		},
+	],
+} as unknown as DocumentNode<MyProfileQuery, MyProfileQueryVariables>
 export const LoginDocument = {
 	kind: "Document",
 	definitions: [
@@ -274,3 +330,43 @@ export const LoginDocument = {
 		},
 	],
 } as unknown as DocumentNode<LoginMutation, LoginMutationVariables>
+export const RefreshTokenDocument = {
+	kind: "Document",
+	definitions: [
+		{
+			kind: "OperationDefinition",
+			operation: "mutation",
+			name: { kind: "Name", value: "refreshToken" },
+			variableDefinitions: [
+				{
+					kind: "VariableDefinition",
+					variable: { kind: "Variable", name: { kind: "Name", value: "refreshToken" } },
+					type: { kind: "NonNullType", type: { kind: "NamedType", name: { kind: "Name", value: "String" } } },
+				},
+			],
+			selectionSet: {
+				kind: "SelectionSet",
+				selections: [
+					{
+						kind: "Field",
+						name: { kind: "Name", value: "refreshToken" },
+						arguments: [
+							{
+								kind: "Argument",
+								name: { kind: "Name", value: "refreshToken" },
+								value: { kind: "Variable", name: { kind: "Name", value: "refreshToken" } },
+							},
+						],
+						selectionSet: {
+							kind: "SelectionSet",
+							selections: [
+								{ kind: "Field", name: { kind: "Name", value: "access_token" } },
+								{ kind: "Field", name: { kind: "Name", value: "refresh_token" } },
+							],
+						},
+					},
+				],
+			},
+		},
+	],
+} as unknown as DocumentNode<RefreshTokenMutation, RefreshTokenMutationVariables>
