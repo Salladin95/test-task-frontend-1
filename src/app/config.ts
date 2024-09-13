@@ -1,3 +1,4 @@
 export const config = {
-	baseUrl: process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:7000",
+	// TODO: extract to the .env
+	graphql: "https://api.escuelajs.co/graphql",
 }

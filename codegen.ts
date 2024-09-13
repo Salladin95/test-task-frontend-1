@@ -1,8 +1,8 @@
+import { config } from "~/app/config"
 import { CodegenConfig } from "@graphql-codegen/cli"
 
 const codegen: CodegenConfig = {
-	// TODO: ADD TO DOT ENV
-	schema: "https://api.escuelajs.co/graphql",
+	schema: config.graphql,
 	documents: ["src/**/*.{ts,tsx}", "app/**/*.{ts,tsx}"],
 	generates: {
 		"./src/__generated__/": {

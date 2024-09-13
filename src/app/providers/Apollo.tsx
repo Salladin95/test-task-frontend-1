@@ -1,9 +1,10 @@
 "use client"
 import React from "react"
+import { config } from "~/app/config"
 import { Token } from "~/shared/types"
-import { refreshToken } from "~/shared/api"
 import { onError } from "@apollo/client/link/error"
 import { setContext } from "@apollo/client/link/context"
+import { refreshToken as makeRefreshTokenCall } from "~/shared/api"
 import { useLocalStoreToken } from "~/shared/hooks/useLocalStoreToken"
 import {
 	ApolloClient,
@@ -18,32 +19,29 @@ import {
 type SetTokenType = ReturnType<typeof useLocalStoreToken>[1]
 
 /**
- * Creates an Apollo Link that adds the authorization token to the headers.
+ * Adds the authorization token to the request headers if available.
  *
- * @param {Token | null} [token] - The user's current token (if available).
- * @returns {ApolloLink} - A context link that attaches the token to the request headers.
+ * @param {Token | null} token - The user's current token (if available).
+ * @returns {ApolloLink} - A link that attaches the token to request headers.
  */
-function createAuthLink(token?: Token | null): ApolloLink {
-	return setContext((_, { headers }) => {
-		return {
-			headers: {
-				...headers,
-				authorization: token ? `Bearer ${token.accessToken}` : "",
-			},
-		}
-	})
-}
+const createAuthLink = (token?: Token | null): ApolloLink =>
+	setContext((_, { headers }) => ({
+		headers: {
+			...headers,
+			authorization: token ? `Bearer ${token.accessToken}` : "",
+		},
+	}))
 
 /**
- * Refreshes the user's access token using the provided refresh token mutation.
+ * Refreshes the access token using the refresh token.
  *
  * @param {SetTokenType} setToken - Function to update the local token storage.
- * @param {string} token - The user's current refresh token.
+ * @param {string} refreshToken - The user's current refresh token.
  * @returns {Promise<Token | null>} - The new token or null if refreshing fails.
  */
-async function handleRefreshToken(setToken: SetTokenType, token: string): Promise<Token | null> {
+const handleRefreshToken = async (setToken: SetTokenType, refreshToken: string): Promise<Token | null> => {
 	try {
-		const res = await refreshToken(token)
+		const res = await makeRefreshTokenCall(refreshToken)
 		const newToken = {
 			accessToken: res.access_token,
 			refreshToken: res.refresh_token,
@@ -53,82 +51,66 @@ async function handleRefreshToken(setToken: SetTokenType, token: string): Promis
 	} catch (error) {
 		console.error("Failed to refresh token:", error)
 		setToken(null)
-		// TODO: SIGN OUT USER
-		return null
+		throw error
 	}
 }
 
 /**
- * Creates an Apollo error link that handles 401 (UNAUTHENTICATED) errors
- * by refreshing the token and retrying the failed operation.
+ * Handles 401 errors by attempting to refresh the token and retrying the failed request.
  *
  * @param {SetTokenType} setToken - Function to update the local token storage.
- * @param {Token | null} [token] - The user's current token (if available).
+ * @param {Token | null} token - The user's current token (if available).
  * @returns {ApolloLink} - An error link that retries the request after refreshing the token.
  */
-function createErrorLink(setToken: SetTokenType, token?: Token | null): ApolloLink {
-	return onError(({ graphQLErrors, operation, forward }) => {
-		if (graphQLErrors) {
-			for (const err of graphQLErrors) {
-				if (err?.extensions?.code === "UNAUTHENTICATED" && token) {
-					// Log for debugging
-					console.log("UNAUTHENTICATED error, attempting to refresh token...")
+const createErrorLink = (setToken: SetTokenType, token?: Token | null): ApolloLink =>
+	onError(({ graphQLErrors, operation, forward }) => {
+		// Check if there are GraphQL errors, and if any of them indicate an UNAUTHENTICATED error.
+		// Also, ensure that the token is available.
+		const unauthenticatedError = graphQLErrors?.some((err) => err?.extensions?.code === "UNAUTHENTICATED" && token)
 
-					return fromPromise(
-						handleRefreshToken(setToken, token.refreshToken)
-							.then((newToken) => {
-								if (newToken) {
-									// Log for debugging
-									console.log("Token refreshed successfully:", newToken)
+		// If an unauthenticated error occurred and the token exists, attempt to refresh the token.
+		if (unauthenticatedError && token) {
+			// Use fromPromise to handle the token refresh asynchronously.
+			return (
+				fromPromise(
+					handleRefreshToken(setToken, token.refreshToken).then((newToken) => {
+						// If token refresh fails or returns null, do not proceed.
+						if (!newToken) return
 
-									// Set new authorization header
-									const oldHeaders = operation.getContext().headers
-									operation.setContext({
-										headers: {
-											...oldHeaders,
-											authorization: `Bearer ${newToken.accessToken}`,
-										},
-									})
+						// Retrieve existing headers from the previous request context.
+						const oldHeaders = operation.getContext().headers
 
-									// Retry the request with the updated headers
-									return forward(operation)
-								} else {
-									// Log for debugging
-									console.log("Failed to refresh token.")
-									return
-								}
-							})
-							.catch((error) => {
-								console.error("Error during token refresh:", error)
-							}),
-					).flatMap((result) => {
-						if (result) {
-							return result
-						}
-						// Optional: handle the case where the token refresh fails
+						// Update the request headers with the newly refreshed token.
+						operation.setContext(() => ({
+							headers: {
+								...oldHeaders,
+								authorization: `Bearer ${newToken.accessToken}`,
+							},
+						}))
+
+						// Retry the original operation with the new headers.
 						return forward(operation)
-					})
-				}
-			}
+					}),
+				)
+					// If token refresh succeeds, forward the updated operation.
+					// Otherwise, attempt to forward the original request anyway.
+					.flatMap((result) => result || forward(operation))
+			)
 		}
 	})
-}
 
 /**
  * Initializes and returns a configured Apollo Client instance.
  */
-function useClient() {
+const useClient = () => {
 	const httpLink = createHttpLink({
-		// TODO: extract to the .env
-		uri: "https://api.escuelajs.co/graphql",
+		uri: config.graphql,
 	})
 
 	const [token, setToken] = useLocalStoreToken()
-
 	const authLink = createAuthLink(token)
 	const errorLink = createErrorLink(setToken, token)
 
-	// Create Apollo Client instance
 	return new ApolloClient({
 		link: from([authLink, errorLink, httpLink]),
 		cache: new InMemoryCache(),
@@ -138,7 +120,7 @@ function useClient() {
 /**
  * ApolloProvider component to wrap the application and provide an Apollo Client context.
  */
-export function ApolloProvider({ children }: { children: React.ReactNode }) {
+export const ApolloProvider = ({ children }: { children: React.ReactNode }) => {
 	const client = useClient()
 	return <Provider client={client}>{children}</Provider>
 }
